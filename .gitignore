@@ -1,0 +1,10 @@
+# Linux / build
+aslr_demo
+demo_aslr
+*.o
+
+# Logs
+*.log
+
+# Temp
+*~
