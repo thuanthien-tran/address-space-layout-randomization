@@ -1,0 +1,8 @@
+# Copy file này thành environment_versions.txt và điền giá trị khi chạy thí nghiệm.
+# Lệnh tham khảo: lsb_release -a, uname -r, uname -m, gcc --version, python3 --version
+
+OS=
+Kernel=
+Arch=
+GCC=
+Python=

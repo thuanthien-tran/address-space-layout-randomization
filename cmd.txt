@@ -1,0 +1,24 @@
+1. Shared Folder
+
+2. Cai goi mount
+sudo apt update
+sudo apt install -y open-vm-tools open-vm-tools-desktop fuse
+sudo reboot
+
+3. Kiem tra sau reboot
+vmware-hgfsclient
+
+ls /mnt/hgfs
+
+! Truong hop khong thay file
+sudo mkdir -p /mnt/hgfs
+sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other -o uid=$(id -u) -o gid=$(id -g)
+ls /mnt/hgfs
+
+4. Copy project ve Home
+cp -r "/mnt/hgfs/Address Space Layout Randomization" ~/
+cd ~/"Address Space Layout Randomization"
+
+5. Chay project
+chmod +x run_all_kali.sh
+./run_all_kali.sh
