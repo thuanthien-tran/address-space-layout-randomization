@@ -79,7 +79,7 @@ Address Space Layout Randomization/
    sudo sysctl -w kernel.randomize_va_space=0
    python3 ../exploits/exploit_phase1_aslr_off.py
    ```
-   → Kỳ vọng: in ra `uid=...` (shell đã mở).
+   → Kỳ vọng: in ra marker `uid=...` (ví dụ `uid=1337`) để xác nhận code execution.
 4. **Giai đoạn 2 — Fail khi ASLR ON:** Xem `exploits/README_EXPLOITS.md` (lấy fixed addr rồi chạy với ASLR=2).
 5. **Giai đoạn 3 — Bypass leak:** ASLR=2, chạy `exploit_phase3_bypass_leak.py`.
 6. **Giai đoạn 4 — ROP bypass NX+ASLR:** `make nx` rồi `python3 ../exploits/exploit_phase4_rop.py`.
@@ -95,6 +95,16 @@ chmod +x run_all_kali.sh
 ```
 
 Script sẽ chạy tuần tự phase 1→4, mitigation matrix, probability model, entropy và PIE (có pause để bạn theo dõi/chụp màn hình).
+
+### Chạy nhanh (máy yếu)
+
+```bash
+cd "Address Space Layout Randomization"
+chmod +x run_all_kali_quick.sh
+SKIP_PAUSE=1 ./run_all_kali_quick.sh | tee run_all_quick.log
+```
+
+Quick mode giảm số vòng lặp (`runs`) để kiểm tra end-to-end nhanh trước khi chạy full mode.
 
 ## Yêu cầu môi trường
 
@@ -116,6 +126,8 @@ Script sẽ chạy tuần tự phase 1→4, mitigation matrix, probability model
 | Độ sâu hệ thống: KASLR, kiến trúc, loader | **docs/SYSTEM_LEVEL_DEPTH.md** |
 | Thiết kế exploit, offset config, reliability | **docs/EXPLOIT_DESIGN.md** |
 | Hardcoded / assumption nguy hiểm, limitations | **docs/ASSUMPTIONS_AND_LIMITATIONS.md** |
+| Threats to validity (internal/external/construct/statistical) | **docs/THREATS_TO_VALIDITY.md** |
+| Kết luận đề xuất + hướng phát triển | **docs/CONCLUSION_AND_FUTURE_WORK.md** |
 | Exploit success probability (500 runs OFF vs ON) | **analysis/exploit_success_probability.py** |
 | Mô hình entropy, thống kê, CI | **docs/ANALYSIS_ENTROPY.md** |
 | Thiết kế thí nghiệm (giả thuyết, biến số) | **docs/EXPERIMENT_DESIGN.md** |

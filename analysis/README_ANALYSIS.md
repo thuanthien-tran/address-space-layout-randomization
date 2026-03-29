@@ -80,3 +80,9 @@ python3 ../analysis/compare_pie.py --runs 5
 ---
 
 Output (CSV, PNG) có thể đưa trực tiếp vào báo cáo và slide.
+
+## Gợi ý trước khi nộp báo cáo
+
+- Chạy full mode: `./run_all_kali.sh | tee full_demo.log`
+- Chạy quick mode (máy yếu): `SKIP_PAUSE=1 ./run_all_kali_quick.sh | tee run_all_quick.log`
+- Gom artifacts: `bash tools/report_pack.sh`
