@@ -118,7 +118,11 @@ def main() -> int:
     elif sx is True:
         print("OK: GNU_STACK RWE (stack executable).")
 
-    print("Đang quét (có thể vài phút)...", flush=True)
+    print(
+        "Gợi ý: chạy trước  python3 tools/gdb_measure_offset.py  (nhanh, chính xác hơn brute-force).\n",
+        flush=True,
+    )
+    print("Đang quét brute-force (có thể vài phút)...", flush=True)
 
     # Thô: offset và delta theo bội 4, phạm vi rộng
     found = scan(
