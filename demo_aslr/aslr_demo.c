@@ -19,23 +19,27 @@ __attribute__((used)) void rop_pop_rdi_ret(void) {
     __asm__("pop %rdi; ret");
 }
 
-/* Buffer 64 byte; sau buffer là saved RBP (8) rồi return address (8) → offset 72 để overwrite RET. */
-void vuln(void) {
+/*
+ * Chỉ có buffer[64] trong frame của vuln → offset tới saved RIP = 64 + 8 (RBP) = 72
+ * (không để malloc pointer làm biến local trong vuln — GCC sắp xếp stack khác nhau → OFFSET_RET lệch).
+ */
+void vuln(void *heap_ptr) {
     char buffer[64];
-    void *heap_ptr = malloc(1);   /* heap - 1 byte chỉ để lấy địa chỉ */
 
     printf("Address of main:   %p (executable)\n", (void *)main);
     printf("Address of printf: %p (library)\n", (void *)printf);
     printf("Address of buffer: %p (stack)\n", (void *)buffer);
-    printf("Address of heap:   %p (heap/malloc)\n", (void *)heap_ptr);
+    printf("Address of heap:   %p (heap/malloc)\n", heap_ptr);
     fflush(stdout); /* Flush ngay để script Python readline() không bị treo khi stdout là pipe */
 
-    free(heap_ptr);
     gets(buffer);   /* Cố tình dùng gets để demo buffer overflow */
 }
 
 int main(void) {
+    void *heap_ptr = malloc(1);
+
     setvbuf(stdout, NULL, _IONBF, 0);
-    vuln();
+    vuln(heap_ptr);
+    free(heap_ptr);
     return 0;
 }
