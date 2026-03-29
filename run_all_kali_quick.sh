@@ -14,6 +14,7 @@ SKIP_PAUSE="${SKIP_PAUSE:-1}"
 
 info() { echo -e "\n[INFO] $*"; }
 warn() { echo -e "\n[WARN] $*"; }
+die() { echo -e "\n[ERROR] $*"; exit 1; }
 
 pause_enter() {
   local msg="${1:-Tiep tuc}"
@@ -34,7 +35,11 @@ make nx
 
 info "Step 2: Phase1 (ASLR OFF)"
 sudo sysctl -w kernel.randomize_va_space=0
-python3 "$EXP_DIR/exploit_phase1_aslr_off.py" || true
+PH1_OUT="$(python3 "$EXP_DIR/exploit_phase1_aslr_off.py" 2>&1 || true)"
+echo "$PH1_OUT"
+if ! echo "$PH1_OUT" | grep -Eq 'uid=[0-9]+'; then
+  die "Phase1 không thấy marker uid=. Kiểm tra exploits/exploit_config.py (shellcode marker) và build demo_aslr."
+fi
 
 info "Step 3: Capture fixed address"
 FIXED_LINE="$(./get_fixed_addr.sh | grep -i 'Address of buffer' || true)"
@@ -61,14 +66,18 @@ else
 fi
 
 info "Step 5: Phase3 (ASLR ON + leak)"
-python3 "$EXP_DIR/exploit_phase3_bypass_leak.py" || true
+PH3_OUT="$(python3 "$EXP_DIR/exploit_phase3_bypass_leak.py" 2>&1 || true)"
+echo "$PH3_OUT"
+if ! echo "$PH3_OUT" | grep -Eq 'uid=[0-9]+'; then
+  die "Phase3 không thấy marker uid=. Bypass leak chưa thành công; không tiếp tục để tránh số liệu sai."
+fi
 
 info "Step 6: Phase4 (ASLR ON + NX + ROP)"
 python3 "$EXP_DIR/exploit_phase4_rop.py" || true
 
 info "Step 7: Mitigation matrix"
 if [[ -n "${FIXED_ADDR:-}" ]]; then
-  python3 "$AN_DIR/mitigation_matrix.py" --fixed-addr "$FIXED_ADDR" --non-interactive || true
+  python3 "$AN_DIR/mitigation_matrix.py" --fixed-addr "$FIXED_ADDR" --non-interactive --auto-sysctl || true
 else
   python3 "$AN_DIR/mitigation_matrix.py" || true
 fi

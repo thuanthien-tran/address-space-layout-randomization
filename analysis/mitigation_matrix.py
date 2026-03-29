@@ -3,7 +3,7 @@
 Mitigation matrix runner:
   No protection | ASLR only | ASLR+leak | ASLR+NX | ASLR+NX+ROP
 
-Script này không đổi sysctl tự động; chỉ nhắc bạn set ASLR đúng trước mỗi bước.
+Mặc định chỉ nhắc set ASLR; bật --auto-sysctl để script tự đổi ASLR theo từng case.
 """
 
 import os
@@ -11,6 +11,16 @@ import re
 import subprocess
 import sys
 import argparse
+
+
+def sysctl_aslr(val: str) -> None:
+    """kernel.randomize_va_space: 0 | 1 | 2. Cần sudo (script demo thường chạy passwordless)."""
+    subprocess.run(
+        ["sudo", "sysctl", "-w", f"kernel.randomize_va_space={val}"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
 
 def run_cmd(args, cwd):
@@ -28,6 +38,11 @@ def main():
     ap = argparse.ArgumentParser(description="Run mitigation comparison matrix.")
     ap.add_argument("--fixed-addr", default="", help="Fixed buffer address for ASLR-only/NX shellcode cases.")
     ap.add_argument("--non-interactive", action="store_true", help="Do not wait for Enter prompts.")
+    ap.add_argument(
+        "--auto-sysctl",
+        action="store_true",
+        help="Gọi sudo sysctl giữa các case (Case1=ASLR0, Case2+=ASLR2). Khớp lab script.",
+    )
     args = ap.parse_args()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -38,6 +53,8 @@ def main():
 
     print("=== CASE 1: No protection (ASLR=0, execstack) ===")
     print("Set: sudo sysctl -w kernel.randomize_va_space=0")
+    if args.auto_sysctl:
+        sysctl_aslr("0")
     if not args.non_interactive:
         input("Nhấn Enter sau khi set xong...")
     code, out = run_cmd(["python3", "../exploits/exploit_phase1_aslr_off.py"], demo_dir)
@@ -45,6 +62,8 @@ def main():
 
     print("=== CASE 2: ASLR only (ASLR=2, fixed addr) ===")
     print("Set: sudo sysctl -w kernel.randomize_va_space=2")
+    if args.auto_sysctl:
+        sysctl_aslr("2")
     fixed = args.fixed_addr.strip()
     if not fixed:
         fixed = input("Nhập fixed_addr (lấy từ get_fixed_addr.sh): ").strip()
