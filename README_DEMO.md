@@ -71,6 +71,7 @@ sudo sysctl -w kernel.randomize_va_space=2
 ### 5. Lưu log để minh họa báo cáo
 
 ```bash
+cd demo_aslr
 ./demo_commands.sh --log
 ```
 

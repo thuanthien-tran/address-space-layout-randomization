@@ -179,7 +179,7 @@ Kết luận nên có:
 4. **Môi trường và công cụ:** Ubuntu, GCC, cách kiểm tra `randomize_va_space`. **Reproducibility:** xem **REPRODUCIBILITY.md** (phiên bản, bước chạy, offsets).
 5. **Thiết kế chương trình demo:** Giải thích `aslr_demo.c` (in địa chỉ main, printf, buffer, heap), lý do dùng `gets`, các flag compile. Có thể thêm so sánh **PIE vs không PIE** (bảng trong LY_THUYET_VA_MO_RONG.md).
 6. **Kết quả thực nghiệm:**  
-   - Bảng/screenshot địa chỉ khi ASLR=0 và ASLR=2 (có thể dùng bảng mẫu và **demo_log.txt** từ script `./demo_commands.sh --log`).  
+   - Bảng/screenshot địa chỉ khi ASLR=0 và ASLR=2 (có thể dùng bảng mẫu và **demo_log.txt** từ script `cd demo_aslr && ./demo_commands.sh --log`).  
    - **GĐ1–GĐ3:** Kết quả exploit khi ASLR OFF (thành công), khi ASLR ON với fixed addr (thất bại), và bypass bằng leak.  
    - **GĐ4:** Bảng/phân phối entropy (stack address qua N lần chạy), file **analysis/entropy_histogram.png** và **stack_addresses.csv**.  
    - **GĐ5:** Bảng so sánh PIE vs non-PIE (địa chỉ main, buffer khi ASLR=2).  
@@ -204,7 +204,7 @@ Kết luận nên có:
 - [ ] Đã đọc phần "Lỗi thường gặp" và tập xử lý (ví dụ quên tắt ASLR thì làm lại).
 - [ ] Báo cáo và slide đã có đủ: mục tiêu, threat model, lý thuyết, môi trường, reproducibility, kết quả 5 giai đoạn, evaluation metrics, entropy, PIE, kết luận.
 - [ ] Đã tham khảo **THREAT_MODEL.md**, **REPRODUCIBILITY.md**, **EVALUATION_METRICS.md**, **LY_THUYET_VA_MO_RONG.md**, **DEFENSE.md**.
-- [ ] (Tùy chọn) Đã chạy `./demo_commands.sh --log` và lưu `demo_log.txt` để minh họa báo cáo.
+- [ ] (Tùy chọn) Đã chạy `cd demo_aslr && ./demo_commands.sh --log` và lưu `demo_log.txt` để minh họa báo cáo.
 
 ---
 

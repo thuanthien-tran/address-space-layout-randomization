@@ -1,10 +1,25 @@
-# Linux / build
-aslr_demo
-demo_aslr
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Build / binaries (root Makefile + demo_aslr)
 *.o
+aslr_demo
+aslr_demo_pie
+aslr_demo_nx
+aslr_demo_nx_pie
+aslr_demo_nx_canary
 
-# Logs
+# Logs & temp
 *.log
-
-# Temp
 *~
+
+# Packed artifacts (tools/report_pack.sh)
+artifacts/
+
+# Generated analysis outputs (tạo lại bằng script)
+analysis/stack_addresses.csv
+analysis/entropy_histogram.png
+analysis/exploit_success_probability.png

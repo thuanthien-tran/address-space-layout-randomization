@@ -1,10 +1,11 @@
-# Linux / build
+# Built binaries
 aslr_demo
-demo_aslr
+aslr_demo_pie
+aslr_demo_nx
+aslr_demo_nx_pie
+aslr_demo_nx_canary
 *.o
 
-# Logs
+# Logs & temp
 *.log
-
-# Temp
 *~

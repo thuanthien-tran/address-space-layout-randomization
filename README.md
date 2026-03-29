@@ -30,6 +30,7 @@ Address Space Layout Randomization/
 ├── EVALUATION_METRICS.md        ← Chỉ số đánh giá (success rate, entropy, PIE)
 ├── DEFENSE.md                   ← ASLR + defense in depth + modern mitigations
 ├── docs/                        ← Độ sâu hệ thống và thiết kế
+│   ├── DEMO_COMMANDS_STANDARD.md← Lệnh chạy demo chuẩn (copy-paste Kali)
 │   ├── SYSTEM_LEVEL_DEPTH.md    ← KASLR, entropy theo kiến trúc, loader mapping
 │   ├── EXPLOIT_DESIGN.md        ← Demonstration vs production, offset config, reliability
 │   ├── ANALYSIS_ENTROPY.md      ← Mô hình entropy, giải thích thống kê, CI
