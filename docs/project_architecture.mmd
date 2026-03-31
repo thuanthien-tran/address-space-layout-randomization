@@ -1,0 +1,22 @@
+flowchart TB
+    A["demo_aslr<br/>(vulnerable program)"] --> B["exploits<br/>(phase1..4, exploit_config)"]
+    B --> C["analysis<br/>(probability, entropy, pie, matrix)"]
+    C --> D["docs<br/>(report content)"]
+    D --> E["tools<br/>(report_pack.sh)"]
+    E --> F["artifacts<br/>(logs, csv, png)"]
+
+    A2["Binaries<br/>(aslr_demo, aslr_demo_pie, aslr_demo_nx)"] --> B
+    B2["Execution output<br/>(uid=1337, leaks, return codes)"] --> C
+    C2["Analysis output<br/>(tables/charts/statistics)"] --> D
+
+    style A fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style B fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style C fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style D fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style E fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style F fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style A2 fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style B2 fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+    style C2 fill:#1F2020,stroke:#A7A7A7,color:#E5E7EB
+
+    linkStyle default stroke:#A7A7A7,stroke-width:1.5px,color:#A7A7A7

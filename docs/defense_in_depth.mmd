@@ -1,0 +1,18 @@
+flowchart LR
+    A["Input dữ liệu"] --> B["Vulnerable code<br/>(buffer overflow)"]
+    B --> C["Ghi đè RET / chiếm luồng điều khiển"]
+    C --> D["Thực thi payload"]
+
+    M1["Input validation<br/>+ code an toàn"] -. chặn sớm .-> B
+    M2["ASLR"] -. tăng độ khó đoán địa chỉ .-> C
+    M3["NX (noexecstack)"] -. chặn shellcode stack .-> D
+    M4["PIE"] -. random vùng mã chính .-> C
+    M5["Canary / CFI / CET"] -. bảo vệ luồng điều khiển .-> C
+
+    classDef attack fill:#1F2020,stroke:#ef4444,color:#e5e7eb,stroke-width:1.5px;
+    classDef defense fill:#1F2020,stroke:#22c55e,color:#e5e7eb,stroke-width:1.5px;
+
+    class A,B,C,D attack;
+    class M1,M2,M3,M4,M5 defense;
+
+    linkStyle default stroke:#A7A7A7,stroke-width:1.4px;

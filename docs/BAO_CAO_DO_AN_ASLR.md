@@ -1,158 +1,202 @@
-# BAO CAO DO AN
+# BÁO CÁO ĐỒ ÁN
 
-## De tai
-Phan tich hieu qua Address Space Layout Randomization (ASLR) trong ngan chan khai thac Buffer Overflow.
+## Đề tài
+**Address Space Layout Randomization (ASLR)**: phân tích hiệu quả trong ngăn chặn khai thác Buffer Overflow.
 
-## Chuong 1. Tong quan de tai
+## Chương 1. Tổng quan đề tài
 
-### 1.1 Ly do chon de tai
-- Buffer overflow la nhom loi kinh dien, co tinh thuc tien cao trong ATHT.
-- ASLR la co che phong thu cot loi tren he dieu hanh hien dai.
-- Do an cho phep ket hop ly thuyet, khai thac, va danh gia dinh luong.
+### 1.1 Lý do chọn đề tài
+- Buffer overflow là nhóm lỗi kinh điển, có tính thực tiễn cao trong ATTT.
+- ASLR là cơ chế phòng thủ quan trọng trên các hệ điều hành hiện đại.
+- Đồ án cho phép kết hợp lý thuyết, kỹ thuật khai thác và đánh giá định lượng.
 
-### 1.2 Muc tieu nghien cuu
-- Chung minh kha nang khai thac khi ASLR tat.
-- Chung minh exploit dia chi co dinh that bai khi ASLR bat.
-- Trinh bay ky thuat bypass ASLR bang information leak.
-- Danh gia dinh luong bang success rate, entropy, va so sanh PIE/non-PIE.
+### 1.2 Mục tiêu nghiên cứu
+- Chứng minh khả năng khai thác khi ASLR tắt.
+- Chứng minh khai thác bằng địa chỉ cố định thất bại khi ASLR bật.
+- Trình bày kỹ thuật bypass ASLR thông qua information leak.
+- Đánh giá định lượng bằng success rate, entropy ước lượng và so sánh PIE/non-PIE.
 
-### 1.3 Doi tuong va pham vi
-- Doi tuong: chuong trinh C co loi stack buffer overflow.
-- Pham vi: user-space tren Linux x86-64, khong di sau KASLR/kernel exploit.
-- Mitigations xem xet: ASLR, NX, PIE; minh hoa ROP ret2libc.
+### 1.3 Đối tượng và phạm vi
+- Đối tượng: chương trình C có lỗi stack buffer overflow.
+- Phạm vi: user-space trên Linux x86-64, không đi sâu KASLR/kernel exploit.
+- Các biện pháp/mitigations xem xét: ASLR, NX, PIE; minh họa ROP ret2libc.
+> [NOTE chèn hình cụ thể] **Hình 1.1 - Phạm vi đề tài** 8:11 PM 3/30/20268:11 PM 3/30/2026 
+> Nội dung cần thể hiện: In-scope (user-space, ASLR/NX/PIE, demo 5 phase), Out-of-scope (kernel exploit/KASLR).  
+> Nguồn hình: tự vẽ (PowerPoint/draw.io).
 
-### 1.4 Cau hoi nghien cuu
-- ASLR lam giam xac suat exploit theo cach nao?
-- Information leak anh huong den hieu qua ASLR ra sao?
-- PIE bo sung gi cho ASLR trong boi canh khai thac?
+### 1.4 Câu hỏi nghiên cứu
+- ASLR làm giảm xác suất exploit theo cách nào?
+- Information leak ảnh hưởng đến hiệu quả ASLR ra sao?
+- PIE bổ sung gì cho ASLR trong bối cảnh khai thác?
 
-### 1.5 Dong gop chinh cua do an
-- Xay dung bo demo 5 giai doan co the tai lap.
-- Bo script tu dong hoa run-to-report.
-- Bo tieu chi danh gia va tai lieu hoa threats/limitations.
+### 1.5 Đóng góp chính của đồ án
+- Xây dựng bộ demo 5 giai đoạn có thể tái lập.
+- Xây dựng script tự động hóa “run-to-report”.
+- Bộ tiêu chí đánh giá và tài liệu hóa threats/limitations.
 
-## Chuong 2. Co so ly thuyet
+## Chương 2. Cơ sở lý thuyết
 
-### 2.1 Tong quan bo nho tien trinh
-#### 2.1.1 Vung executable
-#### 2.1.2 Vung stack
-#### 2.1.3 Vung heap
-#### 2.1.4 Thu vien dung (shared libraries)
+### 2.1 Kiến thức nền tảng
+#### 2.1.1 Vùng executable
+#### 2.1.2 Vùng stack
+#### 2.1.3 Vùng heap
+#### 2.1.4 Thư viện dùng chung (shared libraries)
+> [NOTE chèn hình cụ thể] **Hình 2.1 - Memory layout tiến trình**  
+> Bắt buộc có: `text`, `libc`, `heap`, `stack`, và chiều tăng/giảm địa chỉ.  
+> Nguồn hình: tự vẽ theo kiến trúc Linux x86-64.
 
-### 2.2 Buffer Overflow tren stack
-#### 2.2.1 Co che ghi de return address
-#### 2.2.2 Vai tro cua offset va stack frame
-#### 2.2.3 Dieu kien de khai thac thanh cong
+### 2.2 Cơ chế tấn công
+#### 2.2.1 Cơ chế ghi đè return address
+#### 2.2.2 Vai trò của offset và stack frame
+#### 2.2.3 Điều kiện để khai thác thành công
+> [NOTE chèn hình cụ thể] **Hình 2.2 - Stack frame trước/sau overflow**  
+> Bắt buộc có: `buffer[64]`, saved `RBP`, saved `RIP`, vị trí `OFFSET_RET`.  
+> Nguồn số liệu: `exploits/exploit_config.py` và `demo_aslr/aslr_demo.c`.
 
-### 2.3 Co che ASLR
-#### 2.3.1 Nguyen ly random hoa dia chi
+### 2.3 Cơ chế phòng vệ
+#### 2.3.1 Nguyên lý random hóa địa chỉ
 #### 2.3.2 randomize_va_space (0/1/2)
-#### 2.3.3 Entropy va y nghia bao mat
+#### 2.3.3 Entropy và ý nghĩa bảo mật
+> [NOTE chèn hình cụ thể] **Hình 2.3 - So sánh ASLR OFF vs ON**  
+> Dạng nên dùng: bảng hoặc 2 ảnh terminal đặt cạnh nhau (ASLR=0 địa chỉ lặp lại, ASLR=2 địa chỉ thay đổi).  
+> Lệnh tạo dữ liệu: chạy `./aslr_demo` nhiều lần với `sudo sysctl -w kernel.randomize_va_space=0/2`.
 
-### 2.4 Cac co che bo tro
+### 2.4 Các thành phần liên quan
 #### 2.4.1 NX (Non-Executable stack)
 #### 2.4.2 PIE (Position Independent Executable)
-#### 2.4.3 ROP/ret2libc va vai tro gadget
+#### 2.4.3 ROP/ret2libc và vai trò gadget
+> [NOTE chèn hình cụ thể] **Hình 2.4 - NX và ý tưởng ROP**  
+> Nên có 2 phần: (1) NX chặn thực thi stack, (2) ret2libc/ROP gọi `system("/bin/sh")`.
 
-### 2.5 Han che cua ASLR
+### 2.5 Nhận xét và giới hạn
 #### 2.5.1 Information leak
-#### 2.5.2 Brute-force trong boi canh thuc te
-#### 2.5.3 Su can thiet cua defense in depth
+#### 2.5.2 Brute-force trong bối cảnh thực tế
+#### 2.5.3 Sự cần thiết của defense-in-depth
 
-## Chuong 3. Phan tich va thiet ke he thong demo
+## Chương 3. Phân tích và thiết kế hệ thống demo
 
-### 3.1 Kien truc du an
-#### 3.1.1 Thanh phan demo_aslr
-#### 3.1.2 Thanh phan exploits
-#### 3.1.3 Thanh phan analysis
-#### 3.1.4 Thanh phan docs/tools
+### 3.1 Tổng quan hệ thống
+#### 3.1.1 Thành phần demo_aslr
+#### 3.1.2 Thành phần exploits
+#### 3.1.3 Thành phần analysis
+#### 3.1.4 Thành phần docs/tools
+> [NOTE chèn sơ đồ cụ thể] **Hình 3.1 - Kiến trúc tổng thể dự án**  
+> Bắt buộc có luồng: `demo_aslr` -> `exploits` -> `analysis` -> `tools/report_pack.sh` -> `artifacts/`.
 
-### 3.2 Thiet ke chuong trinh de bi tan cong
-#### 3.2.1 aslr_demo.c va ham vuln()
-#### 3.2.2 Cac thong so build (no-pie, execstack, nx)
-#### 3.2.3 Luong in leak dia chi (main/printf/buffer/heap)
+### 3.2 Thành phần thực thi
+#### 3.2.1 aslr_demo.c và hàm vuln()
+#### 3.2.2 Các thông số build (no-pie, execstack, nx)
+#### 3.2.3 Luồng in leak địa chỉ (main/printf/buffer/heap)
+> [NOTE chèn hình cụ thể] **Hình 3.2 - Luồng chạy aslr_demo**  
+> Chụp terminal có đủ 4 dòng: `main`, `printf`, `buffer`, `heap`.  
+> Nguồn: chạy `./demo_aslr/aslr_demo` (hoặc từ log phase).
 
-### 3.3 Thiet ke exploit theo giai doan
-#### 3.3.1 Giai doan 1: ASLR OFF (shellcode success)
-#### 3.3.2 Giai doan 2: ASLR ON + fixed address (expected fail)
-#### 3.3.3 Giai doan 3: ASLR ON + leak bypass
-#### 3.3.4 Giai doan 4: NX + ASLR + ROP ret2libc
-#### 3.3.5 Giai doan 5: So sanh PIE vs non-PIE
+### 3.3 Quy trình triển khai
+#### 3.3.1 Giai đoạn 1: ASLR OFF (shellcode success)
+#### 3.3.2 Giai đoạn 2: ASLR ON + fixed address (expected fail)
+#### 3.3.3 Giai đoạn 3: ASLR ON + leak bypass
+#### 3.3.4 Giai đoạn 4: NX + ASLR + ROP ret2libc
+#### 3.3.5 Giai đoạn 5: So sánh PIE vs non-PIE
+> [NOTE chèn sơ đồ cụ thể] **Hình 3.3 - Lưu đồ 5 giai đoạn**  
+> Bắt buộc ghi rõ điều kiện từng phase:  
+> P1 (ASLR OFF), P2 (ASLR ON + fixed), P3 (ASLR ON + leak), P4 (NX + ROP), P5 (PIE compare).
 
-### 3.4 Cau hinh va tham so quan trong
-#### 3.4.1 OFFSET_RET va RET_DELTA
+### 3.4 Cấu hình hệ thống
+#### 3.4.1 OFFSET_RET và RET_DELTA
 #### 3.4.2 Shellcode marker uid=1337
-#### 3.4.3 Dieu kien moi truong de tai lap
+#### 3.4.3 Điều kiện môi trường để tái lập đề tài
+> [NOTE chèn bảng cụ thể] **Bảng 3.1 - Tham số cấu hình chính**  
+> Cột gợi ý: `Tham số`, `Giá trị`, `Ý nghĩa`, `File cấu hình`.  
+> Hàng tối thiểu: `OFFSET_RET`, `RET_DELTA`, `SHELLCODE marker`, `binary path`, `build flags`.
 
-## Chuong 4. Cai dat va thuc nghiem
+### 3.5 Yêu cầu hệ thống
+#### 3.5.1 Yêu cầu chức năng (Functional Requirements)
+- FR1: Build được các binary trong `demo_aslr/` theo các cấu hình cần thiết (no-PIE/PIE/NX).
+- FR2: Chạy được chuỗi demo chuẩn theo thứ tự phase (Phase 1 → Phase 5) thông qua `run_all_kali.sh` hoặc chế độ nhanh `run_all_kali_quick.sh`.
+- FR3: Các exploit phase in ra thông tin leak (khi có) và tạo marker thành công để phục vụ đối chiếu kết quả.
+- FR4: Tổng hợp được kết quả thực nghiệm theo từng phase và xuất ra các log/artifact phục vụ báo cáo (`analysis/` và `tools/report_pack.sh`).
+- FR5: Thực hiện được các phép đo định lượng: success rate, entropy ước lượng, so sánh PIE vs non-PIE và lập mitigation matrix.
 
-### 4.1 Moi truong thuc nghiem
-#### 4.1.1 He dieu hanh, compiler, python
-#### 4.1.2 Cong cu phan tich (readelf/objdump/ROPgadget)
-#### 4.1.3 Cau hinh sysctl lien quan ASLR
+#### 3.5.2 Yêu cầu phi chức năng (Non-Functional Requirements)
+- NFR1: Tính tái lập (reproducibility): chạy lại cho ra xu hướng kết quả ổn định trong cùng điều kiện thí nghiệm.
+- NFR2: Tính ổn định pipeline: hạn chế treo/hang do I/O nhờ cơ chế unbuffered/stdout flush trong binary và wrapper khi chạy subprocess.
+- NFR3: Tính vững khi lỗi: nếu không đạt điều kiện marker/leak ở một phase, hệ thống cần dừng hoặc cảnh báo để tránh tạo số liệu sai.
+- NFR4: Tính phù hợp môi trường: hoạt động trên Kali/Ubuntu x86-64 với quyền điều khiển ASLR (sysctl) trong bối cảnh mô phỏng.
+- NFR5: Hiệu quả thời gian: có chế độ quick để kiểm tra nhanh, đồng thời có chế độ full để thu đủ thống kê cho báo cáo.
 
-### 4.2 Quy trinh chay demo chuan
+## Chương 4. Thử nghiệm và đánh giá
+
+### 4.1 Thiết lập thử nghiệm
+#### 4.1.1 Hệ điều hành, compiler, Python
+#### 4.1.2 Công cụ phân tích (readelf/objdump/ROPgadget)
+#### 4.1.3 Cấu hình sysctl liên quan ASLR
+> [NOTE chèn bảng cụ thể] **Bảng 4.1 - Môi trường thực nghiệm**  
+> Điền từ máy chạy demo: `uname -a`, `python3 --version`, `gcc --version`, `ldd --version`, giá trị ASLR.
+
+### 4.2 Quy trình thực hiện
 #### 4.2.1 Build binaries
-#### 4.2.2 Chay run_all_kali.sh / run_all_kali_quick.sh
-#### 4.2.3 Thu thap log va artifacts
+#### 4.2.2 Chạy `run_all_kali.sh` / `run_all_kali_quick.sh`
+#### 4.2.3 Thu thập log và artifacts
+> [NOTE chèn sơ đồ cụ thể] **Hình 4.1 - Quy trình chạy demo chuẩn**  
+> Luồng đề xuất: `git pull` -> `make clean && make...` -> `run_all_kali.sh` -> `report_pack.sh`.
 
-### 4.3 Ket qua giai doan khai thac
-#### 4.3.1 Ket qua Phase1, Phase2, Phase3
-#### 4.3.2 Ket qua Phase4 (ROP) va phan tich
-#### 4.3.3 Bang mitigation matrix
+### 4.3 Kết quả thực hiện
+#### 4.3.1 Kết quả chính
+#### 4.3.2 Kết quả mở rộng
+#### 4.3.3 Tổng hợp kết quả
+> [NOTE chèn hình demo] Chèn 1–2 ảnh terminal tiêu biểu cho các trạng thái chính:  
+> (i) thành công khi ASLR OFF (`uid=1337`), (ii) thất bại khi ASLR ON với địa chỉ cố định, (iii) thành công khi có leak bypass (`uid=1337`).  
+> Ảnh lấy từ output của `run_all_full.log` hoặc `run_all_quick.log`.  
+> [NOTE chèn bảng cụ thể] **Bảng 4.2 - Mitigation matrix**: 5 case (No protection, ASLR only, ASLR+leak, ASLR+NX, ASLR+NX+ROP).  
+> Nguồn dữ liệu: output Step 7.
 
-### 4.4 Ket qua dinh luong
-#### 4.4.1 Exploit success probability (OFF vs ON)
-#### 4.4.2 Entropy do tu du lieu stack address
-#### 4.4.3 PIE comparison ket hop ASLR
+### 4.4 Phân tích số liệu
+#### 4.4.1 Chỉ số hiệu quả
+#### 4.4.2 Chỉ số ngẫu nhiên
+#### 4.4.3 So sánh theo cấu hình
+> [NOTE chèn hình/bảng] Chèn biểu đồ/bảng tương ứng với các chỉ số định lượng: success rate OFF/ON, histogram entropy địa chỉ stack, và so sánh PIE vs non-PIE.  
+> Nguồn dữ liệu: `analysis/exploit_success_probability.png`, `analysis/entropy_histogram.png` và output của `analysis/compare_pie.py` (bảng địa chỉ `main`/`buffer`).
 
-## Chuong 5. Danh gia va thao luan
+### 4.5 Đánh giá tổng hợp
 
-### 5.1 Danh gia theo muc tieu de tai
-#### 5.1.1 Muc tieu dat duoc
-#### 5.1.2 Muc tieu chua dat hoac dat mot phan
+#### 4.5.1 Mức độ hoàn thành
+#### 4.5.2 Ý nghĩa kết quả
+#### 4.5.3 Rủi ro và giới hạn
+#### 4.5.4 Tồn tại hiện tại
+> [NOTE chèn bảng cụ thể] Bảng đối chiếu mục tiêu và mức độ hoàn thành (có thể đặt tên **Bảng 4.4**).  
+> Cột gợi ý: `Mục tiêu`, `Minh chứng`, `Kết quả`, `Mức độ hoàn thành`.
+> [NOTE chèn hình] Defense-in-depth cho memory exploit (có thể là **Hình 4.x**): thể hiện lớp phòng thủ theo tầng (ASLR + NX + PIE + Canary + CFI/CET).  
+> [NOTE chèn bảng cụ thể] Threats to validity (có thể là **Bảng 4.x**): `Nhóm threat`, `Mô tả`, `Ảnh hưởng`, `Biện pháp giảm thiểu`.  
+> Nội dung tham chiếu: `docs/THREATS_TO_VALIDITY.md`.
+- Tập trung user-space, không mở rộng sang kernel-space.
+- ROP phụ thuộc mạnh vào runtime libc và gadget.
+- Kết quả entropy phụ thuộc kiến trúc, kernel và loader.
 
-### 5.2 Phan tich y nghia bao mat
-#### 5.2.1 ASLR giam xac suat khai thac
-#### 5.2.2 Info leak lam suy yeu ASLR
-#### 5.2.3 ASLR can ket hop NX, PIE, canary, CFI
+## Chương 5. Kết luận và hướng phát triển
 
-### 5.3 Threats to validity
-#### 5.3.1 Internal validity
-#### 5.3.2 Construct validity
-#### 5.3.3 External validity
-#### 5.3.4 Statistical conclusion validity
+### 5.1 Kết luận
+- Tổng hợp các kết quả thực nghiệm chính.
+- Khẳng định vai trò của ASLR và giới hạn của nó.
 
-### 5.4 Han che he thong demo
-- Tap trung user-space, khong mo rong sang kernel-space.
-- ROP phu thuoc manh vao runtime libc va gadget.
-- Ket qua entropy phu thuoc kien truc, kernel, loader.
+### 5.2 Hướng phát triển
+#### 5.2.1 Mở rộng sang heap overflow/UAF
+#### 5.2.2 Đánh giá trên nhiều kiến trúc (x86-64, ARM64)
+#### 5.2.3 Tích hợp bộ defense hiện đại (CET/CFI/PAC)
+#### 5.2.4 Tự động hóa thống kê và báo cáo
 
-## Chuong 6. Ket luan va huong phat trien
+## Tài liệu tham khảo
+- Liệt kê theo chuẩn trích dẫn của khoa/bộ môn (IEEE/APA/Vancouver...).
+- Ưu tiên tài liệu gốc: paper, man pages, tài liệu kernel, OWASP/CWE.
 
-### 6.1 Ket luan
-- Tong hop cac ket qua thuc nghiem chinh.
-- Khang dinh vai tro cua ASLR va gioi han cua no.
+## Phụ lục
 
-### 6.2 Huong phat trien
-#### 6.2.1 Mo rong sang heap overflow/UAF
-#### 6.2.2 Danh gia tren nhieu kien truc (x86-64, ARM64)
-#### 6.2.3 Tich hop bo defense hien dai (CET/CFI/PAC)
-#### 6.2.4 Tu dong hoa thong ke va bao cao
+### Phụ lục A. Hướng dẫn chạy nhanh
+- Tham chiếu: `docs/DEMO_COMMANDS_STANDARD.md`.
 
-## Tai lieu tham khao
-- Liet ke theo chuan trich dan cua khoa/bo mon (IEEE/APA/Vancouver...).
-- Uu tien tai lieu goc: paper, man pages, tai lieu kernel, OWASP/CWE.
+### Phụ lục B. Bảng cấu hình và phiên bản
+- Tham chiếu: `environment_versions.txt.example` và artifact snapshot.
 
-## Phu luc
-
-### Phu luc A. Huong dan chay nhanh
-- Tham chieu: `docs/DEMO_COMMANDS_STANDARD.md`.
-
-### Phu luc B. Bang cau hinh va versions
-- Tham chieu: `environment_versions.txt.example` va artifact snapshot.
-
-### Phu luc C. Trich log quan trong
-- Phase1/2/3 logs.
+### Phụ lục C. Trích log quan trọng
+- Phase 1/2/3 logs.
 - Mitigation matrix.
-- Success probability va entropy outputs.
+- Success probability và entropy outputs.

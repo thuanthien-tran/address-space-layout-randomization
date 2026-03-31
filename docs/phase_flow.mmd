@@ -1,0 +1,18 @@
+flowchart LR
+    P1["Phase 1<br/>ASLR OFF<br/>Exploit shellcode -> uid=1337"] --> P2["Phase 2<br/>ASLR ON + fixed address<br/>Expected fail (Success ~ 0/N)"]
+    P2 --> P3["Phase 3<br/>ASLR ON + leak<br/>Bypass -> uid=1337"]
+    P3 --> P4["Phase 4<br/>ASLR ON + NX + ROP ret2libc<br/>Advanced bypass (env-dependent)"]
+    P4 --> P5["Phase 5<br/>PIE vs non-PIE comparison<br/>Observe main/buffer address behavior"]
+
+    P1:::ok
+    P2:::fail
+    P3:::ok
+    P4:::warn
+    P5:::info
+
+    classDef ok fill:#1F2020,stroke:#22c55e,color:#e5e7eb,stroke-width:1.5px;
+    classDef fail fill:#1F2020,stroke:#ef4444,color:#e5e7eb,stroke-width:1.5px;
+    classDef warn fill:#1F2020,stroke:#f59e0b,color:#e5e7eb,stroke-width:1.5px;
+    classDef info fill:#1F2020,stroke:#A7A7A7,color:#e5e7eb,stroke-width:1.5px;
+
+    linkStyle default stroke:#A7A7A7,stroke-width:1.5px;
