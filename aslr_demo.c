@@ -1,18 +1,16 @@
 /*
  * aslr_demo.c - Demo Address Space Layout Randomization (ASLR)
  * Môn: An toàn Hệ điều hành
- * In địa chỉ: executable (main), stack (buffer), thư viện (printf), heap (malloc).
- * Cố tình dùng gets() để demo buffer overflow.
- *
- * Bản gốc ở demo_aslr/aslr_demo.c — file này giữ đồng bộ cho Makefile ở root (nếu dùng).
+ * Bản đồng bộ với demo_aslr/aslr_demo.c — dùng khi build từ Makefile ở root.
  */
 
+#define _GNU_SOURCE
+#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int main(void);
-
-char *gets(char *s);
 
 __attribute__((used)) void rop_pop_rdi_ret(void) {
     __asm__("pop %rdi; ret");
@@ -22,12 +20,16 @@ void vuln(void *heap_ptr) {
     char buffer[64];
 
     printf("Address of main:   %p (executable)\n", (void *)main);
-    printf("Address of printf: %p (library)\n", (void *)printf);
+    {
+        void *libc = dlopen("libc.so.6", RTLD_NOW);
+        void *libc_printf = libc ? dlsym(libc, "printf") : (void *)printf;
+        printf("Address of printf: %p (library)\n", libc_printf);
+    }
     printf("Address of buffer: %p (stack)\n", (void *)buffer);
     printf("Address of heap:   %p (heap/malloc)\n", heap_ptr);
     fflush(stdout);
 
-    gets(buffer);
+    (void)read(STDIN_FILENO, buffer, 400);
 }
 
 int main(void) {

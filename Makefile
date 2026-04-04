@@ -13,14 +13,14 @@ TARGET_PIE = aslr_demo_pie
 all: $(TARGET)
 
 $(TARGET): aslr_demo.c
-	$(CC) $(CFLAGS) aslr_demo.c -o $(TARGET)
+	$(CC) $(CFLAGS) aslr_demo.c -o $(TARGET) -ldl -ldl
 	@echo "Build aslr_demo (no PIE). Chay: ./$(TARGET)"
 	@echo "ASLR OFF: sudo sysctl -w kernel.randomize_va_space=0"
 	@echo "ASLR ON:  sudo sysctl -w kernel.randomize_va_space=2"
 
 # Bản có PIE - dùng để so sánh ASLR có PIE vs không PIE
 $(TARGET_PIE): aslr_demo.c
-	$(CC) $(CFLAGS_PIE) aslr_demo.c -o $(TARGET_PIE)
+	$(CC) $(CFLAGS_PIE) aslr_demo.c -o $(TARGET_PIE) -ldl
 	@echo "Build aslr_demo_pie (PIE). Chay: ./$(TARGET_PIE)"
 	@echo "Khi ASLR=2, dia chi main cung thay doi."
 

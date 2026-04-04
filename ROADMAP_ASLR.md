@@ -68,7 +68,7 @@ cat /proc/sys/kernel/randomize_va_space
 ### 3.1 Tạo file `aslr_demo.c`
 
 - Nằm trong thư mục **demo_aslr/** của project.
-- Nội dung: có buffer overflow (`gets`), in địa chỉ **main** (executable), **printf** (thư viện), **buffer** (stack), **heap** (malloc) để quan sát ASLR toàn bộ không gian địa chỉ.
+- Nội dung: có buffer overflow (`read` đọc quá nhiều byte vào buffer nhỏ), in địa chỉ **main** (executable), **printf** (thư viện), **buffer** (stack), **heap** (malloc) để quan sát ASLR toàn bộ không gian địa chỉ.
 
 ### 3.2 Compile (tắt các cơ chế bảo vệ khác)
 
@@ -177,7 +177,7 @@ Kết luận nên có:
 2. **Formal models:** Nêu **Formal Threat Model** (scope, A1–A5, S1–S3) và **Formal Entropy Model** (H = log2(K), P_guess, 95% CI) — tóm tắt: **FORMAL_MODELS.md**; chi tiết: **THREAT_MODEL.md**, **docs/ANALYSIS_ENTROPY.md**.
 3. **Cơ sở lý thuyết:** ASLR là gì, các mức trên Linux, liên hệ stack/heap/executable. Bổ sung **entropy**, **hạn chế ASLR**, **userland vs KASLR** (xem **LY_THUYET_VA_MO_RONG.md**).
 4. **Môi trường và công cụ:** Ubuntu, GCC, cách kiểm tra `randomize_va_space`. **Reproducibility:** xem **REPRODUCIBILITY.md** (phiên bản, bước chạy, offsets).
-5. **Thiết kế chương trình demo:** Giải thích `aslr_demo.c` (in địa chỉ main, printf, buffer, heap), lý do dùng `gets`, các flag compile. Có thể thêm so sánh **PIE vs không PIE** (bảng trong LY_THUYET_VA_MO_RONG.md).
+5. **Thiết kế chương trình demo:** Giải thích `aslr_demo.c` (in địa chỉ main, printf, buffer, heap), lý do dùng `read` thay `gets` (ROP cần byte 0), các flag compile. Có thể thêm so sánh **PIE vs không PIE** (bảng trong LY_THUYET_VA_MO_RONG.md).
 6. **Kết quả thực nghiệm:**  
    - Bảng/screenshot địa chỉ khi ASLR=0 và ASLR=2 (có thể dùng bảng mẫu và **demo_log.txt** từ script `cd demo_aslr && ./demo_commands.sh --log`).  
    - **GĐ1–GĐ3:** Kết quả exploit khi ASLR OFF (thành công), khi ASLR ON với fixed addr (thất bại), và bypass bằng leak.  

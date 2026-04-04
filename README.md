@@ -36,7 +36,7 @@ Address Space Layout Randomization/
 │   ├── ANALYSIS_ENTROPY.md      ← Mô hình entropy, giải thích thống kê, CI
 │   └── EXPERIMENT_DESIGN.md     ← Thiết kế thí nghiệm: giả thuyết, biến số, cỡ mẫu
 ├── demo_aslr/                   ← Chương trình vulnerable + build
-│   ├── aslr_demo.c              ← Chương trình in địa chỉ (main, printf, buffer, heap) + gets()
+│   ├── aslr_demo.c              ← Chương trình in địa chỉ (main, printf, buffer, heap); đọc input bằng read(2) (overflow + hỗ trợ ROP có byte 0)
 │   ├── Makefile                 ← aslr_demo, aslr_demo_pie, aslr_demo_nx (NX ON)
 │   ├── get_fixed_addr.sh        ← Lấy địa chỉ buffer khi ASLR OFF (cho Giai đoạn 2)
 │   ├── README_DEMO.md           ← Hướng dẫn chạy demo

@@ -2,7 +2,7 @@
 """
 Đo OFFSET_RET bằng GDB: khoảng cách từ &buffer tới ô lưu return address.
 
-Breakpoint đặt tại dòng gets(buffer) (sau khi frame vuln đã dựng xong).
+Breakpoint đặt tại dòng read(STDIN_FILENO, buffer, ...) (sau khi frame vuln đã dựng xong).
 
 Chạy từ thư mục gốc project:
   python3 tools/gdb_measure_offset.py
@@ -20,13 +20,13 @@ sys.path.insert(0, os.path.join(ROOT, "exploits"))
 from exploit_config import get_binary_path, get_demo_dir
 
 
-def _gets_line() -> int:
+def _vuln_input_line() -> int:
     path = os.path.join(ROOT, "demo_aslr", "aslr_demo.c")
     with open(path, encoding="utf-8") as f:
         for i, line in enumerate(f, 1):
-            if "gets(buffer)" in line:
+            if "read(STDIN_FILENO, buffer" in line:
                 return i
-    return 35
+    return 41
 
 
 def main() -> int:
@@ -36,7 +36,7 @@ def main() -> int:
         print("Không thấy binary. Chạy: cd demo_aslr && make", file=sys.stderr)
         return 1
 
-    line = _gets_line()
+    line = _vuln_input_line()
     src_dir = os.path.join(ROOT, "demo_aslr")
 
     ex = [
