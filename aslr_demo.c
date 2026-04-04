@@ -29,7 +29,10 @@ void vuln(void *heap_ptr) {
     printf("Address of heap:   %p (heap/malloc)\n", heap_ptr);
     fflush(stdout);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
     (void)read(STDIN_FILENO, buffer, 400);
+#pragma GCC diagnostic pop
 }
 
 int main(void) {

@@ -38,7 +38,11 @@ void vuln(void *heap_ptr) {
     printf("Address of heap:   %p (heap/malloc)\n", heap_ptr);
     fflush(stdout); /* Flush ngay để script Python readline() không bị treo khi stdout là pipe */
 
+    /* Cố ý đọc quá buffer — demo overflow; tắt cảnh báo GCC về read > sizeof(buffer) */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
     (void)read(STDIN_FILENO, buffer, 400);
+#pragma GCC diagnostic pop
 }
 
 int main(void) {
