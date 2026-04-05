@@ -1,5 +1,6 @@
 /*
  * aslr_demo.c — đồng bộ với demo_aslr/aslr_demo.c (Makefile ở root).
+ * Xem demo_aslr/aslr_demo.c cho mô tả đầy đủ.
  */
 #define _GNU_SOURCE
 #include <dlfcn.h>
@@ -22,7 +23,19 @@ void vuln(void *heap_ptr) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
-    (void)read(STDIN_FILENO, buffer, 400);
+    {
+        unsigned char *q = (unsigned char *)buffer;
+        size_t left = 400;
+        ssize_t n;
+        while (left > 0) {
+            n = read(STDIN_FILENO, q, left);
+            if (n <= 0) {
+                break;
+            }
+            q += (size_t)n;
+            left -= (size_t)n;
+        }
+    }
 #pragma GCC diagnostic pop
 }
 

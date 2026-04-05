@@ -1,0 +1,2 @@
+# Shell scripts phải LF (tránh /bin/bash^M trên Linux/Kali khi clone từ Windows).
+*.sh text eol=lf

@@ -55,9 +55,9 @@ def _vuln_input_line() -> int:
     path = os.path.join(ROOT, "demo_aslr", "aslr_demo.c")
     with open(path, encoding="utf-8") as f:
         for i, line in enumerate(f, 1):
-            if "read(STDIN_FILENO, buffer" in line:
+            if "read(STDIN_FILENO, q, left)" in line:
                 return i
-    return 37
+    return 45
 
 
 def _pick_binary(args: argparse.Namespace) -> str:
